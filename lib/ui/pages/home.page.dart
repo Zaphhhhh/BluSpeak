@@ -1,5 +1,7 @@
 import 'package:bluspeak/ui/widgets/chat.widget.dart';
+import 'package:bluspeak/ui/widgets/connect.widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -9,28 +11,62 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  String _connectionStatus = "Disconnected";
+  BluetoothDevice? _connectedDevice;
+
+  void _showConnectPanel() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF0A0E21),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return FractionallySizedBox(
+          heightFactor: 0.8,
+          child: ConnectWidget(
+            onDeviceConnected: (device) {
+              setState(() {
+                _connectedDevice = device;
+                _connectionStatus = "Connected to ${device.platformName}";
+              });
+            },
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF0A0E21),
+      backgroundColor: const Color(0xFF0A0E21),
       appBar: AppBar(
         backgroundColor: Colors.blue.shade900,
-        title: Text("Disconnected", style: TextStyle(color: Colors.white)),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [ChatWidget()],
+        title: InkWell(
+          onTap: _showConnectPanel,
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              vertical: 8.0,
+              horizontal: 12.0,
+            ),
+            child: Text(
+              _connectionStatus,
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
         ),
       ),
+      body: const ChatWidget(),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Color(0xFF050919),
+        backgroundColor: const Color(0xFF050919),
         selectedItemColor: Colors.blue.shade900,
         unselectedItemColor: Colors.white,
-        selectedLabelStyle: TextStyle(fontWeight: FontWeight.w600),
-        unselectedLabelStyle: TextStyle(fontWeight: FontWeight.w600),
+        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
+        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
         type: BottomNavigationBarType.fixed,
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.message),
             tooltip: "Chats",
